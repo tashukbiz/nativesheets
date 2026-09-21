@@ -562,10 +562,6 @@ tbody tr:last-child td {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--step-2);
 }
-.consent-dialog__customize {
-  justify-self: center;
-  font-size: 0.9375rem;
-}
 
 /* Viewer */
 .viewer {

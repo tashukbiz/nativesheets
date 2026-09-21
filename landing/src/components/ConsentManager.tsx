@@ -143,19 +143,6 @@ export function ConsentManager() {
             {panelOpen ? "Save choices" : "Accept"}
           </button>
         </div>
-        {!panelOpen && (
-          <button
-            type="button"
-            className="link-button consent-dialog__customize"
-            onClick={() => {
-              setAnalytics(false);
-              setAds(false);
-              setPanelOpen(true);
-            }}
-          >
-            Choose preferences
-          </button>
-        )}
       </div>
     </dialog>
   );
