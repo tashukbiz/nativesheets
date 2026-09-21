@@ -23,7 +23,8 @@ const STORAGE_KEY = "native-sheets.consent.v1";
  */
 export const requestedPurposes = {
   analytics: integrations.analytics.enabled,
-  ads: integrations.ads.state === "live",
+  // AdSense uses Google's certified CMP; a local boolean is not TCF consent.
+  ads: false,
 } as const;
 
 export const consentIsRequired = requestedPurposes.analytics || requestedPurposes.ads;

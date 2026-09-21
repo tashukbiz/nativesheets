@@ -1,8 +1,9 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import type { Metadata } from "next";
 import { contact, integrations, siteConfig } from "@/site/config";
 import { href } from "@/site/urls";
 import { pageMetadata } from "@/site/metadata";
+import { AdvertisingPreferencesLink } from "@/components/AdSense";
 import { ConsentPreferencesLink } from "@/components/ConsentManager";
 
 const title = "Privacy";
@@ -36,7 +37,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           {adsLive
-            ? "Advertising is served only if you allow it."
+            ? "Google AdSense uses privacy choices collected through Google’s consent messages."
             : `Advertising is currently ${adsState}: no advertising script is loaded and no ad request is made.`}
         </li>
       </ul>
@@ -66,9 +67,11 @@ export default function PrivacyPage() {
       <h2>Storage on your device</h2>
       {analyticsEnabled || adsLive ? (
         <p>
-          If you make a privacy choice, it is saved in your browser&rsquo;s local storage under a
-          single key so the site does not ask again. It contains your choices and the time you made
-          them, nothing else. Clearing your browser storage removes it and the site will ask again.
+          Analytics choices, when available, are saved in local storage with the time of your
+          choice. When advertising is enabled, Google&rsquo;s consent system also stores privacy
+          choices in cookies or local storage. Google and its partners may use cookies or similar
+          identifiers for advertising according to your choices and applicable requirements.
+          Clearing browser storage removes saved choices.
         </p>
       ) : (
         <p>
@@ -102,27 +105,36 @@ export default function PrivacyPage() {
       <h2>Advertising</h2>
       {adsLive ? (
         <p>
-          Advertising is served by Google AdSense on guide, feature and tool pages. Ad requests are
-          made only after you permit advertising. Google may set and read cookies or similar
-          identifiers to serve and measure ads; its own policies govern that processing.
+          Advertising is provided by Google AdSense on guide and feature articles. The workbook
+          viewer has no advertising scripts or ad slots. Google&rsquo;s consent and advertising
+          scripts load on other pages to display privacy messages and read your choices. Ad units
+          are requested only once Google&rsquo;s consent system has finished collecting any
+          required choices; Google determines which ads may be served from those signals. This
+          can include limited or non-personalised ads where permitted. Google and its partners
+          may receive your IP address, browser information, page URL and advertising identifiers
+          to deliver, personalise and measure ads. See{" "}
+          <a href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites that use its services</a>{" "}
+          and <a href="https://policies.google.com/privacy">Google&rsquo;s Privacy Policy</a>.
         </p>
       ) : (
         <p>
-          This site is built to carry advertising on its guide, feature and tool pages, but
+          This site is built to carry advertising on its guide and feature articles, but
           advertising is currently <strong>{adsState}</strong>. No advertising script is loaded, no
           ad request is made and no advertising identifier is set. Should advertising be switched
-          on, ads would be labelled, kept out of the viewer&rsquo;s controls, and requested only
-          after you permit them, and this page would name the provider first.
+          on, ads would be labelled, kept away from download and viewer controls, and managed
+          through Google&rsquo;s consent system. The workbook viewer remains free of advertising.
         </p>
       )}
 
       <h2>Your choices</h2>
       {analyticsEnabled || adsLive ? (
         <p>
-          You can change or withdraw any choice at any time: <ConsentPreferencesLink />. Withdrawing
-          stops further measurement and advertising requests and clears the identifiers this site can
-          reach from your browser. It cannot delete records a provider has already stored; for that,
-          use the provider&rsquo;s own controls.
+          <ConsentPreferencesLink />{analyticsEnabled && adsLive ? ". " : ""}<AdvertisingPreferencesLink />.
+          Analytics withdrawal stops further measurement and clears analytics cookies this site can
+          reach. Advertising settings reopen Google&rsquo;s applicable privacy message; US visitors
+          may also see Google&rsquo;s “Do not sell or share my personal information” link. Changes
+          cannot delete records a provider has already stored; use the provider&rsquo;s controls
+          for those records.
         </p>
       ) : (
         <p>

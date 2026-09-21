@@ -1,8 +1,9 @@
-import Link from "next/link";
-import { contact, siteConfig } from "@/site/config";
+import Link from "@/components/SiteLink";
+import { contact, integrations, siteConfig } from "@/site/config";
 import { articles, features, routeOf } from "@/site/content";
 import { href } from "@/site/urls";
 import { ConsentPreferencesLink } from "./ConsentManager";
+import { AdvertisingPreferencesLink } from "./AdSense";
 
 export function SiteFooter() {
   return (
@@ -47,6 +48,9 @@ export function SiteFooter() {
               <li>
                 <ConsentPreferencesLink />
               </li>
+              {integrations.ads.state === "live" && (
+                <li><AdvertisingPreferencesLink /></li>
+              )}
             </ul>
           </section>
           <section>

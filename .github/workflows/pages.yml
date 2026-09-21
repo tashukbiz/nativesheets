@@ -28,7 +28,10 @@ jobs:
     env:
       NEXT_PUBLIC_SITE_ORIGIN: https://tashukbiz.github.io
       NEXT_PUBLIC_BASE_PATH: /nativesheets
-      NEXT_PUBLIC_AD_STATE: disabled
+      NEXT_PUBLIC_AD_STATE: ${{ vars.NEXT_PUBLIC_AD_STATE || 'pending-review' }}
+      NEXT_PUBLIC_ADSENSE_CLIENT: ${{ vars.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-7074622316308983' }}
+      NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE: ${{ vars.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE || '2864779511' }}
+      NEXT_PUBLIC_ADSENSE_CMP_READY: ${{ vars.NEXT_PUBLIC_ADSENSE_CMP_READY || 'false' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -49,6 +52,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm run typecheck
+
+      - run: pnpm run lint
 
       - run: pnpm run test
 

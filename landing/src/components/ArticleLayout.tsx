@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { authorById } from "@/site/content/authors";
 import { headings, readingMinutes, relatedTo, routeOf, type ContentRecord } from "@/site/content";
 import { href } from "@/site/urls";

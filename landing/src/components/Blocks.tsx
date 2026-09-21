@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { Fragment, type ReactNode } from "react";
 import type { Block, Inline } from "@/site/content/types";
 import { href } from "@/site/urls";

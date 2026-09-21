@@ -12,6 +12,7 @@ import {
   subscribeConsent,
   withdrawConsent,
 } from "@/site/consent";
+import { integrations } from "@/site/config";
 
 export function useConsent() {
   useEffect(() => {
@@ -127,8 +128,8 @@ export function ConsentManager() {
     <div className="consent-banner" role="region" aria-label="Privacy choices">
       <div className="container consent-banner__inner">
         <p>
-          We ask permission before loading anything optional. Nothing optional runs until you
-          choose, and the workbook viewer works without either choice.
+          Allow analytics to help us understand how the site is used? Measurement loads only
+          after you accept. The workbook viewer works with either choice.
         </p>
         <div className="button-row">
           <button type="button" className="button button--secondary" onClick={rejectAll}>
@@ -157,6 +158,7 @@ export function ConsentManager() {
 /** Footer control that reopens the preference panel. */
 export function ConsentPreferencesLink() {
   if (!consentIsRequired) {
+    if (integrations.ads.state === "live") return null;
     return <span style={{ color: "var(--ink-faint)" }}>No optional tracking</span>;
   }
   return (
@@ -174,7 +176,7 @@ export function ConsentPreferencesLink() {
       }}
       onClick={() => window.dispatchEvent(new Event("native-sheets:open-consent"))}
     >
-      Privacy preferences
+      Analytics preferences
     </button>
   );
 }

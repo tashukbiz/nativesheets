@@ -1,8 +1,8 @@
+import { validateAdConfiguration, type AdState } from "./ad-configuration";
+export type { AdState } from "./ad-configuration";
+
 /** Identity, origin, operator and integration switches for the whole site. */
 export type SiteProfile = "app-discovery" | "ad-supported-web";
-
-/** Monetization state. Live ads require every activation gate in README.md. */
-export type AdState = "disabled" | "preview" | "pending-review" | "live";
 
 const rawOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN?.trim();
 
@@ -58,12 +58,14 @@ export const integrations = {
   ads: {
     state: (process.env.NEXT_PUBLIC_AD_STATE?.trim() || "disabled") as AdState,
     publisherId: process.env.NEXT_PUBLIC_ADSENSE_CLIENT?.trim() || "",
+    cmpReady: process.env.NEXT_PUBLIC_ADSENSE_CMP_READY === "true",
     slots: {
       articleBody: process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE?.trim() || "",
-      toolAside: process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOOL?.trim() || "",
     },
   },
 } as const;
+
+validateAdConfiguration(integrations.ads);
 
 export const contact = {
   email: siteConfig.operator.email,

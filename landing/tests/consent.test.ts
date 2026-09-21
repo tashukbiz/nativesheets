@@ -41,13 +41,13 @@ test("page type is derived from the route, so no page can send a second one", as
 });
 
 test("policy, contact and home routes are never ad-eligible", () => {
-  for (const route of ["/", "/about/", "/privacy/", "/terms/", "/404/"]) {
+  for (const route of ["/", "/viewer/", "/about/", "/privacy/", "/terms/", "/404/"]) {
     assert.equal(routeIsAdEligible(route), false, route);
   }
 });
 
-test("articles, features and the tool page are ad-eligible templates", () => {
-  for (const route of ["/blog/anything/", "/features/formulas/", "/viewer/"]) {
+test("articles and features are ad-eligible templates", () => {
+  for (const route of ["/blog/anything/", "/features/formulas/"]) {
     assert.equal(routeIsAdEligible(route), true, route);
   }
 });
@@ -58,12 +58,15 @@ test("index routes themselves are not ad-eligible", () => {
 });
 
 test("a disabled state neither renders nor requests", () => {
-  const decision = adSlotDecision("article-body", "/blog/anything/");
+  const decision = adSlotDecision("article-body", "/blog/anything/", {
+    state: "disabled", publisherId: "", cmpReady: false, slots: {},
+  });
   assert.equal(decision.render, false);
   assert.equal(decision.request, false);
 });
 
 const realIds = {
+  cmpReady: true,
   publisherId: "ca-pub-1234567890123456",
   slots: { articleBody: "1234567890", toolAside: "9876543210" },
 };
@@ -101,7 +104,7 @@ test("live requests only with real publisher and slot identifiers", () => {
       slots: { articleBody: "your-slot" },
     },
   ]) {
-    const decision = adSlotDecision("article-body", "/blog/anything/", broken);
+    const decision = adSlotDecision("article-body", "/blog/anything/", { cmpReady: true, ...broken });
     assert.equal(decision.request, false, JSON.stringify(broken));
     assert.equal(decision.render, false, JSON.stringify(broken));
   }

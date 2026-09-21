@@ -1,16 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Script from "next/script";
 import { adSlotDecision, type AdPlacement } from "@/site/ads";
-import { integrations } from "@/site/config";
-import { useConsent } from "./ConsentManager";
-
-declare global {
-  interface Window {
-    adsbygoogle?: unknown[];
-  }
-}
+import { useAdSenseReady } from "./AdSense";
 
 /**
  * One abstraction for every ad position. Space is reserved before any request,
@@ -18,16 +10,16 @@ declare global {
  * simply renders nothing rather than collapsing the layout around it.
  */
 export function AdSlot({ placement, route }: { placement: AdPlacement; route: string }) {
-  const consent = useConsent();
+  const ready = useAdSenseReady();
   const decision = adSlotDecision(placement, route);
   const initialised = useRef(false);
-  const mayRequest = decision.request && consent.ads === "granted";
+  const mayRequest = decision.request && ready;
 
   useEffect(() => {
     if (!mayRequest || initialised.current) return;
     initialised.current = true;
     try {
-      window.adsbygoogle = window.adsbygoogle || [];
+      window.adsbygoogle = window.adsbygoogle || ([] as Record<string, never>[]);
       window.adsbygoogle.push({});
     } catch {
       // A blocked or failed provider must leave the page working.
@@ -42,14 +34,6 @@ export function AdSlot({ placement, route }: { placement: AdPlacement; route: st
       <div className="ad-slot__frame">
         {mayRequest ? (
           <>
-            <Script
-              id="adsense-loader"
-              strategy="afterInteractive"
-              crossOrigin="anonymous"
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(
-                decision.publisherId,
-              )}`}
-            />
             <ins
               className="adsbygoogle"
               style={{ display: "block", width: "100%" }}
@@ -61,8 +45,7 @@ export function AdSlot({ placement, route }: { placement: AdPlacement; route: st
           </>
         ) : (
           <span>
-            {decision.previewLabel ??
-              `Reserved space. Ads are ${integrations.ads.state} and make no requests.`}
+            {decision.previewLabel}
           </span>
         )}
       </div>

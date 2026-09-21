@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { siteConfig } from "@/site/config";
 import { download } from "@/site/product";
 import { assetPath, href } from "@/site/urls";

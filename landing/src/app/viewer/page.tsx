@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import type { Metadata } from "next";
 import { contentById, readingMinutes, relatedTo, routeOf } from "@/site/content";
 import { authorById } from "@/site/content/authors";
@@ -6,7 +6,6 @@ import { href } from "@/site/urls";
 import { pageMetadata } from "@/site/metadata";
 import { Blocks } from "@/components/Blocks";
 import { JsonLd } from "@/components/JsonLd";
-import { AdSlot } from "@/components/AdSlot";
 import { WorkbookViewer } from "@/components/WorkbookViewer";
 import { articleSchema, breadcrumbSchema } from "@/site/schema";
 import { formatDate } from "@/components/ArticleLayout";
@@ -57,7 +56,6 @@ export default function ViewerPage() {
 
       <WorkbookViewer />
 
-      <AdSlot placement="tool-aside" route={route} />
 
       <div className="prose">
         <Blocks blocks={record.body} />

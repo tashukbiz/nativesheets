@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { siteConfig } from "@/site/config";
+import { integrations, siteConfig } from "@/site/config";
+import { AdSense } from "@/components/AdSense";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ConsentManager } from "@/components/ConsentManager";
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.operator.name }],
   creator: siteConfig.operator.name,
+  other: ["pending-review", "live"].includes(integrations.ads.state)
+    ? { "google-adsense-account": integrations.ads.publisherId }
+    : {},
   formatDetection: { telephone: false },
   // assetPath, not a bare string: Next does not apply the base path to icon
   // metadata, and a project site is served from a sub-path.
@@ -34,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={siteConfig.language}>
       <body>
+        <AdSense>
         <a className="skip-link" href="#main">
           Skip to content
         </a>
@@ -43,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteFooter />
         <ConsentManager />
         <Analytics />
+        </AdSense>
       </body>
     </html>
   );

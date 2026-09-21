@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import type { Metadata } from "next";
 import { features, routeOf } from "@/site/content";
 import { capabilities, limitations } from "@/site/product";
