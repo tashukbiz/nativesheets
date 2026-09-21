@@ -514,31 +514,53 @@ tbody tr:last-child td {
   cursor: pointer;
 }
 
-.consent-banner {
+.consent-dialog {
   position: fixed;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 50;
+  inset: 0;
+  margin: auto;
+  width: min(32rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--paper);
-  border-top: 1px solid var(--line-strong);
-  box-shadow: 0 -6px 24px rgb(0 0 0 / 8%);
-  padding: var(--step-2) 0;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 70px rgb(0 0 0 / 24%);
+  padding: clamp(1.25rem, 4vw, 2rem);
 }
-.consent-banner__inner {
+.consent-dialog::backdrop {
+  background: rgb(22 25 28 / 60%);
+}
+.consent-dialog__inner {
   display: grid;
   gap: var(--step-2);
 }
-@media (min-width: 900px) {
-  .consent-banner__inner {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-  }
+.consent-dialog h2 {
+  margin: 0;
+  font-size: 1.5rem;
 }
-.consent-banner p {
+.consent-dialog p {
   margin: 0;
   font-size: 0.9375rem;
   color: var(--ink-muted);
-  max-width: 60ch;
+}
+.consent-dialog__options {
+  display: grid;
+  gap: var(--step-2);
+  font-size: 0.9375rem;
+}
+.consent-dialog__options input {
+  accent-color: var(--accent);
+}
+.consent-dialog__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--step-2);
+}
+.consent-dialog__customize {
+  justify-self: center;
+  font-size: 0.9375rem;
 }
 
 /* Viewer */

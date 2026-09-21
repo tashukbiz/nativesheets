@@ -21,16 +21,16 @@ export function useConsent() {
   return useSyncExternalStore(subscribeConsent, getConsent, getServerConsent);
 }
 
-/**
- * One interface for both purposes. Accepting and rejecting are the same kind of
- * button, in the same place, with no preselected permission.
- */
+/** A modal choice with equally prominent accept and reject actions. */
 export function ConsentManager() {
   const consent = useConsent();
   const [panelOpen, setPanelOpen] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [ads, setAds] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const needsDecision = !hasDecided(consent);
+  const isOpen = consentIsRequired && (needsDecision || panelOpen);
 
   useEffect(() => {
     const open = () => {
@@ -43,7 +43,21 @@ export function ConsentManager() {
   }, []);
 
   useEffect(() => {
-    if (panelOpen) panelRef.current?.focus();
+    const dialog = dialogRef.current;
+    // Read the hydrated store to avoid flashing a dialog for a saved choice.
+    if (!dialog || !isOpen || (needsDecision && hasDecided(getConsent()))) return;
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    headingRef.current?.focus();
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen, needsDecision]);
+
+  useEffect(() => {
+    if (panelOpen) headingRef.current?.focus();
   }, [panelOpen]);
 
   const acceptAll = useCallback(() => {
@@ -69,89 +83,81 @@ export function ConsentManager() {
 
   if (!consentIsRequired) return null;
 
-  const showBanner = !hasDecided(consent) && !panelOpen;
-  if (!showBanner && !panelOpen) return null;
-
-  if (panelOpen) {
-    return (
-      <div
-        className="consent-banner"
-        role="dialog"
-        aria-modal="false"
-        aria-label="Privacy preferences"
-        tabIndex={-1}
-        ref={panelRef}
-      >
-        <div className="container consent-banner__inner">
-          <div>
-            <h2 style={{ fontSize: "1rem", margin: "0 0 0.5rem" }}>Privacy preferences</h2>
+  return (
+    <dialog
+      ref={dialogRef}
+      className="consent-dialog"
+      aria-labelledby="consent-title"
+      aria-describedby="consent-description"
+      onCancel={(event) => {
+        // Escape is an accessible rejection, never implicit permission.
+        event.preventDefault();
+        rejectAll();
+      }}
+    >
+      <div className="consent-dialog__inner">
+        <h2 id="consent-title" ref={headingRef} tabIndex={-1}>
+          {panelOpen ? "Privacy preferences" : "Allow analytics?"}
+        </h2>
+        <p id="consent-description">
+          We use Google Analytics to measure page visits and app download clicks.
+          It loads only after you accept. Your workbook contents are never included.
+        </p>
+        {panelOpen && (
+          <div className="consent-dialog__options">
             {requestedPurposes.analytics && (
-              <p>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={analytics}
-                    onChange={(event) => setAnalytics(event.target.checked)}
-                  />{" "}
-                  Measurement: page visits and app download clicks.
-                </label>
-              </p>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={analytics}
+                  onChange={(event) => setAnalytics(event.target.checked)}
+                />{" "}
+                Measurement: page visits and app download clicks.
+              </label>
             )}
             {requestedPurposes.ads && (
-              <p>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={ads}
-                    onChange={(event) => setAds(event.target.checked)}
-                  />{" "}
-                  Advertising: ads served by our advertising partner.
-                </label>
-              </p>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={ads}
+                  onChange={(event) => setAds(event.target.checked)}
+                />{" "}
+                Advertising: ads served by our advertising partner.
+              </label>
             )}
-            <p>The viewer works either way. Neither choice affects it.</p>
           </div>
-          <div className="button-row">
-            <button type="button" className="button button--secondary" onClick={rejectAll}>
-              Reject all
-            </button>
-            <button type="button" className="button button--primary" onClick={saveChoices}>
-              Save choices
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="consent-banner" role="region" aria-label="Privacy choices">
-      <div className="container consent-banner__inner">
+        )}
         <p>
-          Allow analytics to help us understand how the site is used? Measurement loads only
-          after you accept. The workbook viewer works with either choice.
+          The site and app work with either choice. You can change your choice
+          later using Analytics preferences in the footer.
         </p>
-        <div className="button-row">
-          <button type="button" className="button button--secondary" onClick={rejectAll}>
-            Reject
+        <div className="consent-dialog__actions">
+          <button type="button" className="button button--primary" onClick={rejectAll}>
+            {panelOpen ? "Reject all" : "Reject"}
           </button>
           <button
             type="button"
-            className="button button--secondary"
+            className="button button--primary"
+            onClick={panelOpen ? saveChoices : acceptAll}
+          >
+            {panelOpen ? "Save choices" : "Accept"}
+          </button>
+        </div>
+        {!panelOpen && (
+          <button
+            type="button"
+            className="link-button consent-dialog__customize"
             onClick={() => {
               setAnalytics(false);
               setAds(false);
               setPanelOpen(true);
             }}
           >
-            Choose
+            Choose preferences
           </button>
-          <button type="button" className="button button--primary" onClick={acceptAll}>
-            Accept
-          </button>
-        </div>
+        )}
       </div>
-    </div>
+    </dialog>
   );
 }
 
