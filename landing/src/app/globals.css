@@ -540,6 +540,10 @@ tbody tr:last-child td {
   margin: 0;
   font-size: 1.5rem;
 }
+/* The title receives initial focus for screen readers, but is not a control. */
+.consent-dialog h2:focus {
+  outline: none;
+}
 .consent-dialog p {
   margin: 0;
   font-size: 0.9375rem;
