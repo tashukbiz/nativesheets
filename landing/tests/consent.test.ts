@@ -3,6 +3,7 @@ import test from "node:test";
 import { adSlotDecision, routeIsAdEligible } from "../src/site/ads";
 import { sanitizePath } from "../src/site/analytics";
 import { consentIsRequired, defaultConsent, requestedPurposes } from "../src/site/consent";
+import { integrations } from "../src/site/config";
 
 /**
  * These run against the default configuration: no measurement ID, ads disabled.
@@ -15,10 +16,10 @@ test("nothing is granted before a choice", () => {
   assert.equal(defaultConsent.decidedAt, null);
 });
 
-test("no configured purpose means no consent interface at all", () => {
-  assert.equal(requestedPurposes.analytics, false);
+test("the local consent interface asks only for configured analytics", () => {
+  assert.equal(requestedPurposes.analytics, integrations.analytics.enabled);
   assert.equal(requestedPurposes.ads, false);
-  assert.equal(consentIsRequired, false);
+  assert.equal(consentIsRequired, integrations.analytics.enabled);
 });
 
 test("transmitted paths carry no query string, fragment or input", () => {

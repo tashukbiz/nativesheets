@@ -66,6 +66,9 @@ export const integrations = {
 } as const;
 
 validateAdConfiguration(integrations.ads);
+if (integrations.analytics.enabled && !/^G-[A-Z0-9]+$/.test(integrations.analytics.measurementId)) {
+  throw new Error("NEXT_PUBLIC_GA_MEASUREMENT_ID must be a GA4 measurement ID beginning with G-.");
+}
 
 export const contact = {
   email: siteConfig.operator.email,

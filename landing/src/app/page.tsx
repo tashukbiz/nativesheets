@@ -1,3 +1,4 @@
+import { DownloadLink } from "@/components/DownloadLink";
 import Link from "@/components/SiteLink";
 import type { Metadata } from "next";
 import { siteConfig } from "@/site/config";
@@ -39,9 +40,9 @@ export default function HomePage() {
               your browser right now.
             </p>
             <p className="button-row" style={{ marginTop: "var(--step-3)" }}>
-              <a className="button button--primary" href={download.url}>
+              <DownloadLink placement="hero">
                 Download for macOS
-              </a>
+              </DownloadLink>
               <Link className="button button--secondary" href={href("/viewer/")}>
                 Open a workbook in the browser
               </Link>
@@ -166,9 +167,9 @@ export default function HomePage() {
                 universal binary that runs on {product.architecture}.
               </p>
               <p className="button-row">
-                <a className="button button--primary" href={download.url}>
+                <DownloadLink placement="installation">
                   Download {download.fileName}
-                </a>
+                </DownloadLink>
               </p>
               <h3>Installing</h3>
               <ol>
@@ -260,9 +261,9 @@ export default function HomePage() {
             ))}
           </ul>
           <p className="button-row">
-            <a className="button button--primary" href={download.url}>
+            <DownloadLink placement="bottom">
               Download for macOS
-            </a>
+            </DownloadLink>
             <Link className="button button--secondary" href={href("/viewer/")}>
               Open a workbook in the browser
             </Link>

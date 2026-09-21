@@ -1,4 +1,4 @@
-import { integrations } from "./config";
+import { integrations, siteConfig } from "./config";
 
 export type ConsentDecision = "granted" | "denied";
 
@@ -50,11 +50,16 @@ function readStorage(): ConsentState {
 }
 
 function emit() {
+  if (typeof window !== "undefined" && integrations.analytics.enabled) {
+    (window as unknown as Record<string, unknown>)[`ga-disable-${integrations.analytics.measurementId}`] =
+      current.analytics !== "granted" || globalPrivacyControl();
+  }
   for (const listener of listeners) listener();
 }
 
 /** Global Privacy Control, when the browser sends it, is a refusal. */
-function globalPrivacyControl(): boolean {
+export function globalPrivacyControl(): boolean {
+  if (typeof navigator === "undefined") return false;
   const signal = (navigator as Navigator & { globalPrivacyControl?: boolean })
     .globalPrivacyControl;
   return signal === true;
@@ -84,19 +89,19 @@ export function subscribeConsent(listener: () => void): () => void {
 }
 
 export function setConsent(next: Omit<ConsentState, "decidedAt">): void {
-  current = { ...next, decidedAt: new Date().toISOString() };
+  current = { ...next, analytics: globalPrivacyControl() ? "denied" : next.analytics, decidedAt: new Date().toISOString() };
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
   } catch {
     // A failed write must not break the site; the choice holds for this page.
   }
   emit();
+  if (current.analytics === "denied") clearMeasurementIdentifiers();
 }
 
 /** Withdraws everything and clears the identifiers this site can reach. */
 export function withdrawConsent(): void {
   setConsent({ analytics: "denied", ads: "denied" });
-  clearMeasurementIdentifiers();
 }
 
 function clearMeasurementIdentifiers(): void {
@@ -104,10 +109,12 @@ function clearMeasurementIdentifiers(): void {
   const measurementCookies = document.cookie
     .split(";")
     .map((entry) => entry.split("=")[0]?.trim() ?? "")
-    .filter((name) => name === "_ga" || name.startsWith("_ga_") || name === "_gid");
+    .filter((name) => name === "native_sheets_ga" || name.startsWith("native_sheets_ga_"));
   for (const name of measurementCookies) {
-    document.cookie = `${name}=; Max-Age=0; path=/`;
-    document.cookie = `${name}=; Max-Age=0; path=/; domain=.${window.location.hostname}`;
+    for (const path of new Set(["/", siteConfig.basePath || "/"])) {
+      document.cookie = `${name}=; Max-Age=0; path=${path}`;
+      document.cookie = `${name}=; Max-Age=0; path=${path}; domain=.${window.location.hostname}`;
+    }
   }
 }
 

@@ -34,6 +34,19 @@ Build-time environment variables. Local builds default to ads disabled. The GitH
 | `NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE` | Slot ID for article pages |
 | `NEXT_PUBLIC_ADSENSE_CMP_READY` | Set to `true` only after publishing and checking Google consent messages |
 
+## Analytics
+
+The Native Sheets web stream is `G-VD4613FW3V`, configured through the repository Actions variable `NEXT_PUBLIC_GA_MEASUREMENT_ID`. Changing that variable requires a redeploy. Keep **Enhanced measurement off** in that stream: page views and app downloads are sent explicitly so automatic history tracking cannot double-count them or capture viewer interactions.
+
+Measurement starts only after analytics consent and stops on withdrawal or Global Privacy Control. The first visit is queued before the Google script loads. Page URLs and referrers omit query strings and fragments, and cookies use the `native_sheets` prefix and the site's base path. Google Signals and ad personalisation signals are disabled in the tag.
+
+- `page_view`: page location, title and page type. View these in **Reports → Engagement → Pages and screens** (or search for “Pages and screens” in Analytics).
+- `file_download`: clicks on the public `NativeSheets.zip` link, with `file_name`, `file_extension`, `link_url`, `link_id` and `placement`. Placements are `header`, `hero`, `installation` and `bottom`. These are clicks, not confirmed downloads or installations.
+
+Use **Reports → Realtime** to check incoming events; standard reports can take time to populate. Mark `file_download` as a key event to report download intent. Create an event-scoped custom dimension for `placement` to compare the buttons. No workbook filenames, cell contents, viewer exports or form inputs are measured.
+
+Sources: [manual page views](https://developers.google.com/analytics/devguides/collection/ga4/views), [download event parameters](https://support.google.com/analytics/answer/9216061), [programmatic opt-out](https://developers.google.com/tag-platform/security/guides/privacy).
+
 ## Content
 
 Content is typed records under `src/site/content/`. There is no CMS.

@@ -9,7 +9,6 @@ import {
   sheetToCsv,
   type ParsedWorkbook,
 } from "@/lib/xlsx";
-import { track } from "@/site/analytics";
 
 type Status =
   | { kind: "idle" }
@@ -34,18 +33,15 @@ export function WorkbookViewer() {
     setStatus({ kind: "reading", name: file.name });
     setSheetIndex(0);
     setSelection(null);
-    track("tool_start", { tool_id: "viewer", placement: "viewer-page" });
     try {
       const workbook = await readWorkbook(file);
       setStatus({ kind: "ready", workbook });
-      track("tool_complete", { tool_id: "viewer", outcome: "workbook_opened" });
     } catch (error) {
       const message =
         error instanceof XlsxError
           ? error.message
           : "This file could not be read. It may not be an .xlsx workbook.";
       setStatus({ kind: "error", message });
-      track("tool_complete", { tool_id: "viewer", outcome: "read_failed" });
     }
   }, []);
 
@@ -68,7 +64,6 @@ export function WorkbookViewer() {
     anchor.download = `${sheet.name.replace(/[^\w.-]+/g, "-")}.csv`;
     anchor.click();
     URL.revokeObjectURL(url);
-    track("tool_complete", { tool_id: "viewer", outcome: "csv_exported" });
   }, [sheet, workbook]);
 
   const selectedCell = useMemo(() => {

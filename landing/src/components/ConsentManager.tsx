@@ -93,7 +93,7 @@ export function ConsentManager() {
                     checked={analytics}
                     onChange={(event) => setAnalytics(event.target.checked)}
                   />{" "}
-                  Measurement: anonymous page and feature statistics.
+                  Measurement: page visits and app download clicks.
                 </label>
               </p>
             )}

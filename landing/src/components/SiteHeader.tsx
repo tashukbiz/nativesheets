@@ -1,6 +1,6 @@
 import Link from "@/components/SiteLink";
 import { siteConfig } from "@/site/config";
-import { download } from "@/site/product";
+import { DownloadLink } from "./DownloadLink";
 import { assetPath, href } from "@/site/urls";
 
 const navigation = [
@@ -24,9 +24,9 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <a className="button button--primary" href={download.url}>
+          <DownloadLink placement="header">
             Download
-          </a>
+          </DownloadLink>
         </nav>
       </div>
     </header>

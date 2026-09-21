@@ -3,12 +3,16 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import { integrations } from "@/site/config";
-import { sanitizePath, trackPageView } from "@/site/analytics";
+import { integrations, siteConfig } from "@/site/config";
+import { initializeAnalytics, sanitizePath, trackPageView } from "@/site/analytics";
+import { globalPrivacyControl } from "@/site/consent";
 import { useConsent } from "./ConsentManager";
 
 /** The page type a route belongs to, derived so no page can declare its own. */
 export function pageTypeOf(pathname: string): string {
+  if (siteConfig.basePath && pathname.startsWith(`${siteConfig.basePath}/`)) {
+    pathname = pathname.slice(siteConfig.basePath.length);
+  }
   if (pathname === "/") return "home";
   if (pathname === "/blog/") return "blog-index";
   if (pathname.startsWith("/blog/")) return "article";
@@ -30,14 +34,15 @@ export function Analytics() {
   const pathname = usePathname();
   const pageType = pageTypeOf(pathname ?? "/");
   const lastSent = useRef<string | null>(null);
-  const allowed = integrations.analytics.enabled && consent.analytics === "granted";
+  const allowed = integrations.analytics.enabled && consent.analytics === "granted" && !globalPrivacyControl();
 
   useEffect(() => {
     if (!allowed) {
       lastSent.current = null;
       return;
     }
-    const path = sanitizePath(pathname ?? "/");
+    if (!initializeAnalytics()) return;
+    const path = sanitizePath(window.location.pathname);
     if (lastSent.current === path) return;
     lastSent.current = path;
     trackPageView(path, pageType);
@@ -47,18 +52,10 @@ export function Analytics() {
 
   const id = integrations.analytics.measurementId;
   return (
-    <>
       <Script
         id="ga-loader"
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`}
       />
-      <Script id="ga-init" strategy="afterInteractive">
-        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-window.gtag=window.gtag||gtag;
-gtag('js', new Date());
-gtag('config', ${JSON.stringify(id)}, { send_page_view: false, anonymize_ip: true });`}
-      </Script>
-    </>
   );
 }

@@ -85,13 +85,18 @@ export default function PrivacyPage() {
         <>
           <p>
             Measurement uses Google Analytics 4, provided by Google. It loads only after you allow
-            it, and it does not load at all before a choice is made. It records which pages are
-            viewed, how the viewer is used in coarse terms (a workbook was opened, a read failed, a
-            CSV was exported), and standard technical information the provider collects.
+            it, and it does not load at all before a choice is made. It records page visits,
+            clicks on the Native Sheets app download buttons (including which button was used),
+            and standard technical information the provider collects. Download clicks measure
+            intent to download, not completed downloads or installations.
           </p>
           <p>
-            Page addresses are stripped of query strings and fragments before they are sent. File
-            names, sheet names, cell contents and anything else from a workbook are never included.
+            Page addresses and referrers are stripped of query strings and fragments before they
+            are sent. The public app filename NativeSheets.zip is included in download events;
+            names of your own files, sheet names, cell contents and other workbook data are never
+            included. Analytics uses cookies named with the native_sheets prefix. Google Signals
+            and advertising personalisation are disabled for this measurement integration. See{" "}
+            <a href="https://policies.google.com/technologies/partner-sites">how Google uses data from partner sites</a>.
           </p>
         </>
       ) : (
